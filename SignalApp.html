@@ -1,0 +1,70 @@
+!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Auto Execute</title>
+</head>
+<body>
+<script>
+// Get URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+const keepalive = urlParams.get("keepalive");
+const token = urlParams.get("token");
+const contactId = urlParams.get("contactid");
+ 
+// Check if required parameters exist
+if (!token || !contactId) {
+showMessage(
+"Missing required URL parameters (token and/or contactid)",
+"warning",
+);
+//submitBtn.disabled = true;
+}
+ 
+// This function executes every 10 seconds
+function executeTask() {
+try {
+//const token = await fetchAccessToken();
+console.log(token);
+ 
+console.log(contactId);
+const response = fetch(
+`https://api-b32.nice-incontact.com/incontactapi/services/v33.0/interactions/${contactId}/signal`,
+
+{
+method: "POST",
+headers: {
+Authorization: `Bearer ${token}`,
+"Content-Type": "application/json",
+},
+body: JSON.stringify({
+p1: "keepAlive",
+}),
+},
+);
+ 
+if (response.ok) {
+console.log("API Called");
+} else {
+const errorText = response.text();
+console.log("API Called " + errorText);
+}
+} catch (error) {
+console.log(`Error: ${error.message}`, "error");
+} finally {
+}
+console.log("Task executed at " + new Date().toLocaleTimeString());
+ 
+// Add your custom logic here
+}
+ 
+// Execute immediately on page load
+executeTask();
+ 
+// Execute every 10 seconds (10000 milliseconds)
+setInterval(executeTask, keepalive);
+</script>
+</body>
+</html>
+
